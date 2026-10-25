@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejercicio 3: Cambio de Imagen al Pasar el Ratón</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; font-family: "Segoe UI", Arial, sans-serif; background: #fef3c7; color: #292524; }
+  h1 { margin: 0; text-align: center; }
+  #imagen { width: min(360px, 85vw); height: auto; border-radius: 24px; border: 6px solid #fff; box-shadow: 0 14px 30px rgba(0,0,0,.25); cursor: pointer; transition: opacity .35s ease, transform .35s ease, box-shadow .35s ease; }
+  #imagen.cambiando { opacity: 0; transform: scale(.92) rotate(-2deg); }
+  #imagen.activa { box-shadow: 0 20px 40px rgba(0,0,0,.35); }
+  a { color: #b45309; text-decoration: none; }
+</style>
+</head>
+<body>
+  <h1>Pasa el ratón sobre la imagen</h1>
+  <img id="imagen" alt="Imagen que cambia al pasar el ratón">
+  <a href="index.html">← Volver al menú</a>
+
+<script>
+  // Dos imágenes SVG generadas en línea (no requieren archivos externos)
+  const dia = "data:image/svg+xml;utf8," + encodeURIComponent(`
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'>
+      <defs><linearGradient id='c' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#38bdf8'/><stop offset='1' stop-color='#e0f2fe'/></linearGradient></defs>
+      <rect width='400' height='300' fill='url(#c)'/>
+      <circle cx='300' cy='80' r='45' fill='#fde047'/>
+      <path d='M0 300 L120 150 L220 260 L290 190 L400 300Z' fill='#16a34a'/>
+      <text x='200' y='40' font-size='28' text-anchor='middle' fill='#075985' font-family='Arial'>☀ DÍA</text>
+    </svg>`);
+  const noche = "data:image/svg+xml;utf8," + encodeURIComponent(`
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'>
+      <defs><linearGradient id='c' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#0f172a'/><stop offset='1' stop-color='#312e81'/></linearGradient></defs>
+      <rect width='400' height='300' fill='url(#c)'/>
+      <circle cx='300' cy='80' r='40' fill='#f1f5f9'/><circle cx='318' cy='72' r='36' fill='#1e1b4b'/>
+      <g fill='#fff'><circle cx='60' cy='50' r='2'/><circle cx='120' cy='90' r='3'/><circle cx='200' cy='45' r='2'/><circle cx='250' cy='120' r='2'/><circle cx='30' cy='140' r='2'/></g>
+      <path d='M0 300 L120 150 L220 260 L290 190 L400 300Z' fill='#14532d'/>
+      <text x='200' y='40' font-size='28' text-anchor='middle' fill='#c7d2fe' font-family='Arial'>☾ NOCHE</text>
+    </svg>`);
+
+  const img = document.getElementById("imagen");
+  img.src = dia;
+
+  function cambiarA(nueva, activa) {
+    img.classList.add("cambiando");           // desvanece
+    setTimeout(() => {
+      img.src = nueva;                        // cambia la imagen
+      img.classList.toggle("activa", activa);
+      img.classList.remove("cambiando");      // reaparece
+    }, 250);
+  }
+
+  img.addEventListener("mouseover", () => cambiarA(noche, true));
+  img.addEventListener("mouseout",  () => cambiarA(dia, false));
+</script>
+</body>
+</html>

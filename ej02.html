@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejercicio 2: Calculadora Simple</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; font-family: "Segoe UI", Arial, sans-serif; background: #0f172a; color: #e2e8f0; }
+  .calc { width: 300px; padding: 18px; border-radius: 20px; background: #1e293b; box-shadow: 0 20px 40px rgba(0,0,0,.4); }
+  #pantalla { width: 100%; height: 60px; margin-bottom: 14px; padding: 0 14px; font-size: 1.8rem; text-align: right; border: 0; border-radius: 12px; background: #0b1220; color: #fff; }
+  .teclas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  button { height: 56px; font-size: 1.2rem; border: 0; border-radius: 12px; cursor: pointer; background: #334155; color: #fff; transition: filter .15s, transform .1s; }
+  button:hover { filter: brightness(1.2); }
+  button:active { transform: scale(.94); }
+  .op { background: #f59e0b; }
+  .igual { background: #22c55e; }
+  .borrar { background: #ef4444; }
+  a { color: #7dd3fc; text-decoration: none; }
+</style>
+</head>
+<body>
+  <h1>Calculadora Simple</h1>
+  <div class="calc">
+    <input type="text" id="pantalla" value="0" readonly>
+    <div class="teclas">
+      <button class="borrar" data-accion="limpiar">C</button>
+      <button class="borrar" data-accion="borrar">⌫</button>
+      <button class="op" data-op="/">/</button>
+      <button class="op" data-op="*">*</button>
+
+      <button data-num="7">7</button>
+      <button data-num="8">8</button>
+      <button data-num="9">9</button>
+      <button class="op" data-op="-">-</button>
+
+      <button data-num="4">4</button>
+      <button data-num="5">5</button>
+      <button data-num="6">6</button>
+      <button class="op" data-op="+">+</button>
+
+      <button data-num="1">1</button>
+      <button data-num="2">2</button>
+      <button data-num="3">3</button>
+      <button class="igual" data-accion="igual" style="grid-row: span 2; height: auto;">=</button>
+
+      <button data-num="0" style="grid-column: span 2;">0</button>
+      <button data-num=".">.</button>
+    </div>
+  </div>
+  <a href="index.html">← Volver al menú</a>
+
+<script>
+  const pantalla = document.getElementById("pantalla");
+  let actual = "0";      // número que se está escribiendo
+  let anterior = null;   // primer operando
+  let operador = null;   // operador pendiente
+  let nuevo = true;      // si el siguiente dígito reinicia el número
+
+  function mostrar(v) { pantalla.value = v; }
+
+  function calcular(a, b, op) {
+    switch (op) {
+      case "+": return a + b;
+      case "-": return a - b;
+      case "*": return a * b;
+      case "/": return b === 0 ? NaN : a / b;
+    }
+    return b;
+  }
+
+  function formatear(n) {
+    if (!isFinite(n)) return "Error";
+    return String(parseFloat(n.toFixed(10)));
+  }
+
+  document.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const { num, op, accion } = btn.dataset;
+
+      if (num !== undefined) {
+        if (num === "." && actual.includes(".") && !nuevo) return;
+        if (nuevo) { actual = num === "." ? "0." : num; nuevo = false; }
+        else actual += num;
+        mostrar(actual);
+      }
+      else if (op) {
+        if (operador && !nuevo) {
+          anterior = calcular(anterior, parseFloat(actual), operador);
+          mostrar(formatear(anterior));
+        } else {
+          anterior = parseFloat(actual);
+        }
+        operador = op;
+        nuevo = true;
+      }
+      else if (accion === "igual") {
+        if (operador === null) return;
+        const r = calcular(anterior, parseFloat(actual), operador);
+        actual = formatear(r);
+        mostrar(actual);
+        if (actual === "Error") actual = "0";
+        operador = null; anterior = null; nuevo = true;
+      }
+      else if (accion === "limpiar") {
+        actual = "0"; anterior = null; operador = null; nuevo = true;
+        mostrar("0");
+      }
+      else if (accion === "borrar") {
+        if (nuevo) return;
+        actual = actual.length > 1 ? actual.slice(0, -1) : "0";
+        mostrar(actual);
+      }
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejercicio 10: Juego de Preguntas y Respuestas</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; font-family: "Segoe UI", Arial, sans-serif; background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #1e293b; }
+  .juego { width: min(520px, 92vw); padding: 28px; background: #fff; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,.3); }
+  .info { display: flex; justify-content: space-between; font-size: .85rem; color: #64748b; margin-bottom: 8px; }
+  .progreso { height: 6px; background: #e2e8f0; border-radius: 4px; margin-bottom: 18px; overflow: hidden; }
+  #barra { height: 100%; width: 0; background: #6366f1; transition: width .3s; }
+  h2 { margin: 0 0 16px; font-size: 1.25rem; }
+  .opcion { display: block; width: 100%; margin-bottom: 10px; padding: 12px 14px; text-align: left; font-size: 1rem; border: 2px solid #cbd5e1; border-radius: 10px; background: #f8fafc; cursor: pointer; transition: background .2s, border-color .2s; }
+  .opcion:hover:not(:disabled) { background: #eef2ff; border-color: #6366f1; }
+  .opcion.correcta { background: #dcfce7; border-color: #22c55e; }
+  .opcion.incorrecta { background: #fee2e2; border-color: #ef4444; }
+  #siguiente { margin-top: 6px; padding: 10px 24px; border: 0; border-radius: 8px; background: #6366f1; color: #fff; font-size: 1rem; cursor: pointer; display: none; }
+  .final { text-align: center; }
+  .final .nota { font-size: 3rem; font-weight: 700; color: #6366f1; }
+  a { color: #fff; text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="juego" id="juego"></div>
+  <a href="index.html">← Volver al menú</a>
+
+<script>
+  const preguntas = [
+    { p: "¿Qué significa HTML?", o: ["HyperText Markup Language", "High Tech Modern Language", "HyperTransfer Markup Link", "Home Tool Markup Language"], c: 0 },
+    { p: "¿Qué lenguaje se usa para dar estilo a una página web?", o: ["Python", "CSS", "SQL", "PHP"], c: 1 },
+    { p: "¿Qué etiqueta HTML crea un enlace?", o: ["<link>", "<href>", "<a>", "<url>"], c: 2 },
+    { p: "¿Qué método de JavaScript selecciona un elemento por su id?", o: ["getElementById()", "querySelectorAll()", "getElementsByTag()", "findId()"], c: 0 },
+    { p: "¿Cuál de estas es la forma correcta de declarar una variable constante en JS?", o: ["var x = 1", "let x = 1", "const x = 1", "static x = 1"], c: 2 }
+  ];
+
+  const juego = document.getElementById("juego");
+  let actual = 0, puntos = 0, respondida = false;
+
+  function mostrarPregunta() {
+    const q = preguntas[actual];
+    respondida = false;
+    juego.innerHTML = `
+      <div class="info"><span>Pregunta ${actual + 1} de ${preguntas.length}</span><span>Puntos: ${puntos}</span></div>
+      <div class="progreso"><div id="barra" style="width:${actual / preguntas.length * 100}%"></div></div>
+      <h2></h2><div id="opciones"></div>
+      <button id="siguiente"></button>`;
+    juego.querySelector("h2").textContent = q.p;
+    q.o.forEach((texto, i) => {
+      const b = document.createElement("button");
+      b.className = "opcion";
+      b.textContent = texto;
+      b.addEventListener("click", () => responder(i, b));
+      document.getElementById("opciones").appendChild(b);
+    });
+  }
+
+  function responder(i, boton) {
+    if (respondida) return;
+    respondida = true;
+    const q = preguntas[actual];
+    const botones = document.querySelectorAll(".opcion");
+    botones.forEach(b => b.disabled = true);
+    if (i === q.c) { puntos++; boton.classList.add("correcta"); }
+    else { boton.classList.add("incorrecta"); botones[q.c].classList.add("correcta"); }
+
+    const sig = document.getElementById("siguiente");
+    sig.textContent = actual === preguntas.length - 1 ? "Ver resultado" : "Siguiente";
+    sig.style.display = "inline-block";
+    sig.addEventListener("click", () => {
+      actual++;
+      actual < preguntas.length ? mostrarPregunta() : mostrarFinal();
+    });
+  }
+
+  function mostrarFinal() {
+    const porc = Math.round(puntos / preguntas.length * 100);
+    const msg = porc === 100 ? "¡Perfecto! 🏆" : porc >= 60 ? "¡Buen trabajo! 👍" : "Sigue practicando 📚";
+    juego.innerHTML = `
+      <div class="final">
+        <h2>Juego terminado</h2>
+        <div class="nota">${puntos} / ${preguntas.length}</div>
+        <p>${porc}% de aciertos — ${msg}</p>
+        <button id="siguiente" style="display:inline-block">Jugar de nuevo</button>
+      </div>`;
+    document.getElementById("siguiente").addEventListener("click", () => { actual = 0; puntos = 0; mostrarPregunta(); });
+  }
+
+  mostrarPregunta();
+</script>
+</body>
+</html>

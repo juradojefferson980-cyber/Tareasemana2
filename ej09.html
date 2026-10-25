@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejercicio 9: Temporizador de Cuenta Regresiva</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; font-family: "Segoe UI", Arial, sans-serif; background: #1c1917; color: #fafaf9; }
+  .config { display: flex; align-items: center; gap: 8px; }
+  .config input { width: 70px; padding: 8px; font-size: 1.1rem; text-align: center; border: 2px solid #57534e; border-radius: 8px; background: #292524; color: #fff; }
+  #tiempo { font-size: clamp(3rem, 14vw, 6rem); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 4px; transition: color .3s; }
+  #tiempo.alerta { color: #ef4444; animation: parpadeo 1s infinite; }
+  #tiempo.fin { color: #22c55e; }
+  .barra { width: min(420px, 90vw); height: 10px; border-radius: 6px; background: #44403c; overflow: hidden; }
+  #progreso { height: 100%; width: 100%; background: #f59e0b; transition: width 1s linear; }
+  .botones { display: flex; gap: 10px; }
+  button { padding: 10px 22px; font-size: 1rem; border: 0; border-radius: 999px; cursor: pointer; color: #fff; }
+  #iniciar { background: #16a34a; } #pausar { background: #d97706; } #reiniciar { background: #dc2626; }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  @keyframes parpadeo { 50% { opacity: .4; } }
+  a { color: #fdba74; text-decoration: none; }
+</style>
+</head>
+<body>
+  <h1>Cuenta Regresiva</h1>
+  <div class="config">
+    <input type="number" id="min" min="0" max="999" value="1"> min
+    <input type="number" id="seg" min="0" max="59" value="0"> seg
+  </div>
+  <div id="tiempo">01:00</div>
+  <div class="barra"><div id="progreso"></div></div>
+  <div class="botones">
+    <button id="iniciar">Iniciar</button>
+    <button id="pausar" disabled>Pausar</button>
+    <button id="reiniciar">Reiniciar</button>
+  </div>
+  <a href="index.html">← Volver al menú</a>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const pad = n => String(n).padStart(2, "0");
+  let total = 0, restante = 0, intervalo = null;
+
+  function leerConfig() {
+    const m = Math.max(0, parseInt($("min").value) || 0);
+    const s = Math.min(59, Math.max(0, parseInt($("seg").value) || 0));
+    return m * 60 + s;
+  }
+
+  function pintar() {
+    $("tiempo").textContent = `${pad(Math.floor(restante / 60))}:${pad(restante % 60)}`;
+    $("progreso").style.width = total ? (restante / total * 100) + "%" : "0%";
+    $("tiempo").classList.toggle("alerta", restante > 0 && restante <= 10);
+  }
+
+  function detener() { clearInterval(intervalo); intervalo = null; $("pausar").disabled = true; $("iniciar").disabled = false; }
+
+  function tic() {
+    restante--;
+    pintar();
+    if (restante <= 0) {
+      detener();
+      $("tiempo").classList.remove("alerta");
+      $("tiempo").classList.add("fin");
+      $("tiempo").textContent = "¡Tiempo!";
+    }
+  }
+
+  $("iniciar").addEventListener("click", () => {
+    if (intervalo) return;
+    if (restante <= 0) { total = restante = leerConfig(); if (total === 0) return; }
+    $("tiempo").classList.remove("fin");
+    pintar();
+    intervalo = setInterval(tic, 1000);
+    $("iniciar").disabled = true; $("pausar").disabled = false;
+  });
+
+  $("pausar").addEventListener("click", detener);
+
+  $("reiniciar").addEventListener("click", () => {
+    detener();
+    $("tiempo").classList.remove("fin");
+    total = restante = leerConfig();
+    pintar();
+  });
+
+  ["min", "seg"].forEach(id => $(id).addEventListener("change", () => { if (!intervalo) $("reiniciar").click(); }));
+
+  total = restante = leerConfig();
+  pintar();
+</script>
+</body>
+</html>

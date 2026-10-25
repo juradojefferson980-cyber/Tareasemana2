@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejercicio 8: Carrusel de Imágenes</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; font-family: "Segoe UI", Arial, sans-serif; background: #18181b; color: #fafafa; }
+  .carrusel { position: relative; width: min(640px, 94vw); aspect-ratio: 16 / 9; overflow: hidden; border-radius: 18px; box-shadow: 0 20px 40px rgba(0,0,0,.5); }
+  .pista { display: flex; height: 100%; transition: transform .6s ease; }
+  .pista img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; }
+  .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border: 0; border-radius: 50%; background: rgba(0,0,0,.5); color: #fff; font-size: 1.4rem; cursor: pointer; }
+  .nav:hover { background: rgba(0,0,0,.8); }
+  #prev { left: 12px; } #next { right: 12px; }
+  .puntos { position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; }
+  .punto { width: 11px; height: 11px; border-radius: 50%; background: rgba(255,255,255,.5); cursor: pointer; }
+  .punto.activo { background: #fff; transform: scale(1.25); }
+  a { color: #93c5fd; text-decoration: none; }
+</style>
+</head>
+<body>
+  <h1>Carrusel de Imágenes</h1>
+  <div class="carrusel" id="carrusel">
+    <div class="pista" id="pista"></div>
+    <button class="nav" id="prev" aria-label="Anterior">‹</button>
+    <button class="nav" id="next" aria-label="Siguiente">›</button>
+    <div class="puntos" id="puntos"></div>
+  </div>
+  <a href="index.html">← Volver al menú</a>
+
+<script>
+  // Diapositivas generadas como SVG en línea
+  const datos = [
+    { texto: "Montañas",  c1: "#0ea5e9", c2: "#1e3a8a", emoji: "⛰" },
+    { texto: "Atardecer", c1: "#f97316", c2: "#7c2d12", emoji: "🌅" },
+    { texto: "Bosque",    c1: "#22c55e", c2: "#14532d", emoji: "🌲" },
+    { texto: "Océano",    c1: "#06b6d4", c2: "#164e63", emoji: "🌊" }
+  ];
+  const imagenes = datos.map(d => "data:image/svg+xml;utf8," + encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'>
+       <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${d.c1}'/><stop offset='1' stop-color='${d.c2}'/></linearGradient></defs>
+       <rect width='640' height='360' fill='url(#g)'/>
+       <text x='320' y='190' font-size='90' text-anchor='middle'>${d.emoji}</text>
+       <text x='320' y='270' font-size='36' text-anchor='middle' fill='#fff' font-family='Arial' font-weight='bold'>${d.texto}</text>
+     </svg>`));
+
+  const pista = document.getElementById("pista");
+  const puntos = document.getElementById("puntos");
+  let indice = 0, temporizador;
+
+  imagenes.forEach((src, i) => {
+    const img = document.createElement("img");
+    img.src = src; img.alt = datos[i].texto;
+    pista.appendChild(img);
+    const p = document.createElement("div");
+    p.className = "punto";
+    p.addEventListener("click", () => { ir(i); reiniciar(); });
+    puntos.appendChild(p);
+  });
+
+  function ir(i) {
+    indice = (i + imagenes.length) % imagenes.length;
+    pista.style.transform = `translateX(-${indice * 100}%)`;
+    [...puntos.children].forEach((p, k) => p.classList.toggle("activo", k === indice));
+  }
+
+  function reiniciar() {
+    clearInterval(temporizador);
+    temporizador = setInterval(() => ir(indice + 1), 3000);   // cambia cada 3 s
+  }
+
+  document.getElementById("next").addEventListener("click", () => { ir(indice + 1); reiniciar(); });
+  document.getElementById("prev").addEventListener("click", () => { ir(indice - 1); reiniciar(); });
+
+  ir(0);
+  reiniciar();
+</script>
+</body>
+</html>

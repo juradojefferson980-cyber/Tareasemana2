@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejercicio 7: Menú de Navegación Desplegable</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: #f8fafc; color: #1e293b; }
+  nav { background: #1e3a8a; }
+  .menu { display: flex; flex-wrap: wrap; list-style: none; margin: 0; padding: 0 16px; }
+  .menu > li { position: relative; }
+  .menu > li > a { display: block; padding: 16px 20px; color: #fff; text-decoration: none; cursor: pointer; user-select: none; }
+  .menu > li > a:hover, .menu > li.abierto > a { background: #1d4ed8; }
+  .flecha { display: inline-block; margin-left: 6px; font-size: .7rem; transition: transform .2s; }
+  .abierto .flecha { transform: rotate(180deg); }
+  .submenu { display: none; position: absolute; top: 100%; left: 0; min-width: 200px; list-style: none; margin: 0; padding: 6px 0; background: #fff; border-radius: 0 0 10px 10px; box-shadow: 0 12px 24px rgba(0,0,0,.2); z-index: 10; }
+  .abierto > .submenu { display: block; animation: aparecer .2s ease; }
+  .submenu a { display: block; padding: 10px 18px; color: #1e293b; text-decoration: none; }
+  .submenu a:hover { background: #dbeafe; }
+  main { padding: 32px 24px; max-width: 700px; margin: auto; }
+  @keyframes aparecer { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  a.volver { color: #2563eb; text-decoration: none; }
+</style>
+</head>
+<body>
+  <nav>
+    <ul class="menu">
+      <li><a>Inicio</a></li>
+      <li>
+        <a class="principal">Productos <span class="flecha">▼</span></a>
+        <ul class="submenu">
+          <li><a>Laptops</a></li>
+          <li><a>Teléfonos</a></li>
+          <li><a>Accesorios</a></li>
+        </ul>
+      </li>
+      <li>
+        <a class="principal">Servicios <span class="flecha">▼</span></a>
+        <ul class="submenu">
+          <li><a>Soporte técnico</a></li>
+          <li><a>Instalación</a></li>
+        </ul>
+      </li>
+      <li>
+        <a class="principal">Contacto <span class="flecha">▼</span></a>
+        <ul class="submenu">
+          <li><a>Escríbenos</a></li>
+          <li><a>Ubicación</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+  <main>
+    <h1>Menú desplegable</h1>
+    <p>Haz clic en un elemento principal (Productos, Servicios, Contacto) para mostrar u ocultar su submenú. Al abrir uno, los demás se cierran; también se cierran al hacer clic fuera.</p>
+    <a class="volver" href="index.html">← Volver al menú</a>
+  </main>
+
+<script>
+  const principales = document.querySelectorAll(".principal");
+
+  principales.forEach(enlace => {
+    enlace.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const li = this.parentElement;
+      const estabaAbierto = li.classList.contains("abierto");
+      document.querySelectorAll(".menu > li.abierto").forEach(x => x.classList.remove("abierto"));
+      if (!estabaAbierto) li.classList.add("abierto");
+    });
+  });
+
+  // Cerrar al hacer clic fuera del menú
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".menu > li.abierto").forEach(x => x.classList.remove("abierto"));
+  });
+</script>
+</body>
+</html>

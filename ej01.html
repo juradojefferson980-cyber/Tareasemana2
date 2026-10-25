@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejercicio 1: Cambio de Estilo al Clic</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; font-family: "Segoe UI", Arial, sans-serif; background: #f1f5f9; color: #1e293b; }
+  h1 { margin: 0; font-size: 1.6rem; }
+  #caja { width: min(420px, 90vw); height: 220px; border-radius: 20px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; font-size: 1.3rem; font-weight: 600; color: #fff; background: #3b82f6; box-shadow: 0 12px 30px rgba(0,0,0,.25); transition: background-color .6s ease, transform .3s ease; }
+  #caja.pulso { transform: scale(1.05); }
+  button { padding: 12px 28px; font-size: 1rem; border: 0; border-radius: 999px; background: #1e293b; color: #fff; cursor: pointer; transition: transform .15s, background .2s; }
+  button:hover { background: #334155; transform: translateY(-2px); }
+  nav a { color: #2563eb; text-decoration: none; }
+</style>
+</head>
+<body>
+  <h1>Cambio de Estilo al Clic</h1>
+  <div id="caja">Haz clic en el botón para cambiar mi color</div>
+  <button id="btnColor">Cambiar color</button>
+  <nav><a href="index.html">← Volver al menú</a></nav>
+
+<script>
+  const caja = document.getElementById("caja");
+  const boton = document.getElementById("btnColor");
+
+  function colorAleatorio() {
+    const h = Math.floor(Math.random() * 360);
+    return `hsl(${h}, 70%, 50%)`;
+  }
+
+  boton.addEventListener("click", function () {
+    const color = colorAleatorio();
+    caja.style.backgroundColor = color;
+    caja.textContent = "Color actual: " + color;
+    caja.classList.add("pulso");
+    setTimeout(() => caja.classList.remove("pulso"), 300);
+  });
+</script>
+</body>
+</html>

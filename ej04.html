@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejercicio 4: Reloj Analógico</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; font-family: "Segoe UI", Arial, sans-serif; background: #111827; color: #f9fafb; }
+  .reloj { position: relative; width: 320px; height: 320px; border-radius: 50%; background: #f8fafc; border: 10px solid #374151; box-shadow: 0 0 0 4px #9ca3af, 0 20px 40px rgba(0,0,0,.5); }
+  .num { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px; text-align: center; line-height: 30px; font-weight: 700; color: #111827; }
+  /* Las manecillas son imágenes (img) rotadas desde su base */
+  .mano { position: absolute; left: 50%; bottom: 50%; transform-origin: 50% 100%; transform: translateX(-50%) rotate(0deg); }
+  #imgHora { height: 80px; width: 10px; }
+  #imgMin  { height: 115px; width: 8px; }
+  #imgSeg  { height: 130px; width: 4px; }
+  .centro { position: absolute; left: 50%; top: 50%; width: 16px; height: 16px; margin: -8px; border-radius: 50%; background: #dc2626; border: 3px solid #111827; }
+  #digital { font-size: 1.6rem; font-variant-numeric: tabular-nums; letter-spacing: 2px; }
+  a { color: #93c5fd; text-decoration: none; }
+</style>
+</head>
+<body>
+  <h1>Reloj Analógico</h1>
+  <div class="reloj" id="reloj">
+    <img class="mano" id="imgHora" alt="Manecilla de la hora">
+    <img class="mano" id="imgMin"  alt="Minutero">
+    <img class="mano" id="imgSeg"  alt="Segundero">
+    <div class="centro"></div>
+  </div>
+  <div id="digital">--:--:--</div>
+  <a href="index.html">← Volver al menú</a>
+
+<script>
+  // Imágenes de las manecillas (SVG en línea)
+  function manecilla(color) {
+    return "data:image/svg+xml;utf8," + encodeURIComponent(
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 100' preserveAspectRatio='none'>
+         <path d='M5 0 L10 100 L0 100Z' fill='${color}'/></svg>`);
+  }
+  document.getElementById("imgHora").src = manecilla("#111827");
+  document.getElementById("imgMin").src  = manecilla("#374151");
+  document.getElementById("imgSeg").src  = manecilla("#dc2626");
+
+  // Números 1–12 alrededor de la esfera
+  const reloj = document.getElementById("reloj");
+  for (let n = 1; n <= 12; n++) {
+    const ang = (n * 30 - 90) * Math.PI / 180;
+    const d = document.createElement("div");
+    d.className = "num";
+    d.textContent = n;
+    d.style.left = (150 + 120 * Math.cos(ang)) + "px";
+    d.style.top  = (150 + 120 * Math.sin(ang)) + "px";
+    reloj.appendChild(d);
+  }
+
+  const pad = n => String(n).padStart(2, "0");
+
+  function rotar(id, grados) {
+    document.getElementById(id).style.transform = `translateX(-50%) rotate(${grados}deg)`;
+  }
+
+  function actualizar() {
+    const ahora = new Date();
+    const h = ahora.getHours(), m = ahora.getMinutes(), s = ahora.getSeconds();
+    rotar("imgSeg", s * 6);
+    rotar("imgMin", m * 6 + s * 0.1);
+    rotar("imgHora", (h % 12) * 30 + m * 0.5);
+    document.getElementById("digital").textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }
+
+  actualizar();
+  setInterval(actualizar, 1000);
+</script>
+</body>
+</html>

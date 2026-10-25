@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejercicio 6: Lista de Tareas Interactiva</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; font-family: "Segoe UI", Arial, sans-serif; background: #ecfdf5; color: #064e3b; }
+  .app { width: min(420px, 92vw); padding: 24px; background: #fff; border-radius: 18px; box-shadow: 0 16px 36px rgba(0,0,0,.15); }
+  h1 { margin: 0 0 16px; text-align: center; font-size: 1.5rem; }
+  .entrada { display: flex; gap: 8px; }
+  input { flex: 1; padding: 10px 12px; font-size: 1rem; border: 2px solid #a7f3d0; border-radius: 8px; outline: none; }
+  input:focus { border-color: #10b981; }
+  .agregar { padding: 0 18px; border: 0; border-radius: 8px; background: #10b981; color: #fff; font-size: 1rem; cursor: pointer; }
+  .agregar:hover { background: #059669; }
+  ul { list-style: none; margin: 16px 0 0; padding: 0; }
+  li { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; background: #f0fdf4; cursor: pointer; animation: entrar .25s ease; }
+  li.hecha span { text-decoration: line-through; opacity: .55; }
+  .eliminar { border: 0; border-radius: 6px; padding: 4px 10px; background: #ef4444; color: #fff; cursor: pointer; }
+  #contador { margin-top: 10px; text-align: center; font-size: .85rem; color: #047857; }
+  @keyframes entrar { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+  a { color: #047857; text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="app">
+    <h1>Lista de Tareas</h1>
+    <div class="entrada">
+      <input type="text" id="nuevaTarea" placeholder="Escribe una tarea y pulsa Enter">
+      <button class="agregar" id="btnAgregar">Agregar</button>
+    </div>
+    <ul id="lista"></ul>
+    <div id="contador"></div>
+  </div>
+  <a href="index.html">← Volver al menú</a>
+
+<script>
+  const entrada = document.getElementById("nuevaTarea");
+  const lista = document.getElementById("lista");
+  const contador = document.getElementById("contador");
+
+  function actualizarContador() {
+    const total = lista.children.length;
+    const hechas = lista.querySelectorAll("li.hecha").length;
+    contador.textContent = total === 0 ? "No hay tareas pendientes 🎉" : `${hechas} de ${total} completadas`;
+  }
+
+  function agregarTarea() {
+    const texto = entrada.value.trim();
+    if (texto === "") { entrada.focus(); return; }
+
+    const li = document.createElement("li");
+    const span = document.createElement("span");
+    span.textContent = texto;
+    const btn = document.createElement("button");
+    btn.className = "eliminar";
+    btn.textContent = "Eliminar";
+
+    li.addEventListener("click", () => { li.classList.toggle("hecha"); actualizarContador(); });
+    btn.addEventListener("click", e => { e.stopPropagation(); li.remove(); actualizarContador(); });
+
+    li.append(span, btn);
+    lista.appendChild(li);
+    entrada.value = "";
+    entrada.focus();
+    actualizarContador();
+  }
+
+  document.getElementById("btnAgregar").addEventListener("click", agregarTarea);
+  entrada.addEventListener("keydown", e => { if (e.key === "Enter") agregarTarea(); });
+  actualizarContador();
+</script>
+</body>
+</html>
